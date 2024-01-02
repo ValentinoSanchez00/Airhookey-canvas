@@ -107,8 +107,108 @@ window.onload = function () {
         }
 
 
-       
+        var alturaTela = elemento.height;
+        var larguraTela = elemento.width;
+
+        var x = Math.floor((Math.random() * larguraTela) + 1);
+        var y = Math.floor((Math.random() * alturaTela) + 1);
+        var r = 10;
+        var vX = 5;
+        var vY = 5;
+        var bola = new Bola(x, y, r, vX, vY);
+        var eu = new Bola(Math.floor((Math.random() * larguraTela) + 1), Math.floor((Math.random() * alturaTela) + 1), r, vX, vY);
+        var destino = new Destino(eu.x, eu.y);
+        var bolas = new Array();
+        bolas.push(bola);
+        bolas.push(eu);
+
+        setInterval(function () { bola.moveAuto(); }, 2000);
+
+        dibujar();
+
+        animar();
     } else {
         console.log("No funciona en absoluto");
+    }
+
+    function dibujar() {
+        contexto.clearRect(0, 0, larguraTela, alturaTela);
+        contexto.fillStyle = "#FF0000";
+        contexto.beginPath();
+        contexto.moveTo(bola.x, bola.y);
+        contexto.arc(bola.x, bola.y, bola.r, 0, Math.PI * 2);
+        contexto.closePath();
+        contexto.fill();
+
+        contexto.fillStyle = "#0000FF";
+        contexto.beginPath();
+        contexto.moveTo(eu.x, eu.y);
+        contexto.arc(eu.x, eu.y, eu.r, 0, Math.PI * 2);
+        contexto.closePath();
+        contexto.fill();
+
+        contexto.beginPath();
+        contexto.fillStyle = "#FF7F50";
+        contexto.fillRect(destino.x, destino.y, destino.w, destino.h);
+        contexto.fill();
+    }
+
+    function animar() {
+        bola.checkColision();
+        bola.update();
+
+        eu.checkColision();
+        eu.checaDestino();
+        asesinato();
+        dibujar();
+
+        setTimeout(animar, 30);
+    }
+
+    elemento.onclick = function (e) {
+        var pX;
+        var pY;
+        pX = e.pageX - this.offsetLeft;
+        pY = e.pageY - this.offsetTop;
+        eu.setaDestinoX(pX);
+        eu.setaDestinoY(pY);
+        eu.mover = 1;
+
+        destino.update(pX, pY);
+
+
+    }
+
+    function asesinato() {
+        for (var i = 0; i + 1 < bolas.length; i++) {
+            var j = i + 1;
+            var anterior = bolas[i];
+            var proximo = bolas[j];
+
+            if ((
+                (bolas[i].x + 2 * bolas[i].r) > bolas[j].x
+                &&
+                (bolas[i].x + 2 * bolas[i].r) < (2 * bolas[j].r + bolas[j].x)
+            ) &&
+                (
+                    (bolas[i].y + 2 * bolas[i].r) > bolas[j].y
+                    &&
+                    (bolas[i].y + 2 * bolas[i].r) < (2 * bolas[j].r + bolas[j].y)
+                )
+            ) {
+                alert("Felicidades has colisionado las bolas");
+                location.reload()
+
+            }
+
+        }
+    }
+
+    function retornaParImpar() {
+        var um;
+        var check;
+        um = Math.floor((Math.random() * 6) + 1);
+        check = (um % 2 == 0 ? true : false);
+        return check;
     }
 }
